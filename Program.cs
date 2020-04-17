@@ -6,153 +6,120 @@ namespace HW
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            const string Const = @"Data Source=localhost; Initial Catalog=Test;Integrated Security=True";
-            SqlConnection connection = new SqlConnection(Const);
-            bool work = true;
-            while (work == true)
+            ArrayHelper<string> functionList = new ArrayHelper<string>();
+            string[] words = {"horse","dog","Elephant","Payrav","Akmal","MadMax"};
+            functionList.Slice(ref words, 1, -3);
+            foreach(var item in words)
             {
-                System.Console.WriteLine("Choose Operation");
-                System.Console.WriteLine("1.Insert");
-                System.Console.WriteLine("2.SelectAll");
-                System.Console.WriteLine("3.SelectBy");
-                System.Console.WriteLine("4.Delete");
-                System.Console.WriteLine("5.Update");
-                System.Console.WriteLine("6.Quit");
-                int operation = int.Parse(Console.ReadLine());
-                switch (operation)
-                {
-                    case 1:
-                        {
-                            System.Console.Write("Name:");
-                            string Name = Console.ReadLine();
-                            System.Console.Write("SurName:");
-                            string SurName = Console.ReadLine();
-                            System.Console.Write("MiddleName:");
-                            string MiddleName = Console.ReadLine();
-                            Insert(Name, SurName, MiddleName, connection);
-                        }
-                        break;
-                    case 2:
-                        {
-                            SelectAll(connection);
-                        }
-                        break;
-                    case 3:
-                        {
-                            System.Console.Write("ID:");
-                            int ID = int.Parse(Console.ReadLine());
-                            SelectBy(connection, ID);
-                        }break;
-                        
-                    case 4:
-                        {
-                            System.Console.Write("ID:");
-                            int ID = int.Parse(Console.ReadLine());
-                            DeleteBy(connection, ID);
-                        }break;
-                        
-                    case 5:
-                        {
-                            System.Console.Write("Name:");
-                            string Name = Console.ReadLine();
-                            System.Console.Write("SurName:");
-                            string SurName = Console.ReadLine();
-                            System.Console.Write("MiddleName:");
-                            string MiddleName = Console.ReadLine();
-                            System.Console.Write("ID:");
-                            int ID = int.Parse(Console.ReadLine());
-                            UpdateBy(connection, Name, SurName, MiddleName, ID);
-                        }
-                        break;
-                    case 6: work = false;connection.Close();break;
-                }
+                System.Console.Write(item+",");
             }
-        }
-        static void SelectAll(SqlConnection connection)
-        {
-            connection.Open();
-            SqlCommand command = new SqlCommand("select * from Person", connection);
-            SqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                System.Console.WriteLine($"ID:{reader.GetValue(0)},Name:{reader.GetValue(1)},SurName:{reader.GetValue(2)},MiddleName:{reader.GetValue(3)},BirthDate:{reader.GetValue(4)}");
-            }
-            connection.Close();
-        }
-        static void Insert(string Name, string SurName, string MiddleName, SqlConnection connection)
-        {
-            string DateTimeDB = $"{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}";
-            connection.Open();
-            SqlCommand command = new SqlCommand($"insert into Person(Name,SurName,MiddleName,BirthDate)Values('{Name}','{SurName}','{MiddleName}','{DateTimeDB}')", connection);
-            SqlDataReader reader = command.ExecuteReader();
-            if (reader != null)
-            {
-                System.Console.WriteLine("Added Succsesfully");
-            }
-            else
-            {
-                System.Console.WriteLine("Something went wrong");
-            }
-            connection.Close();
-        }
-        static void SelectBy(SqlConnection connection, int ID)
-        {
-            connection.Open();
-            SqlCommand command = new SqlCommand($"select * from Person where ID={ID}", connection);
-            SqlDataReader reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                System.Console.WriteLine($"ID:{reader.GetValue(0)},Name:{reader.GetValue(1)},SurName:{reader.GetValue(2)},MiddleName:{reader.GetValue(3)},BirthDate:{reader.GetValue(4)}");
-            }
-            connection.Close();
-        }
-        static void UpdateBy(SqlConnection connection, string Name, string SurName, string MiddleName, int ID)
-        {
-            connection.Open();
-            string DateTimeDB = $"{DateTime.Now.Day}-{DateTime.Now.Month}-{DateTime.Now.Year}";
-            if (Name != null && SurName != null && MiddleName != null)
-            {
-                SqlCommand Testcommand = new SqlCommand($"select * from Person where ID={ID}", connection);
-                SqlDataReader Testreader = Testcommand.ExecuteReader();
-                if (Testreader.Read())
-                {
-                    connection.Close();
-                    connection.Open();
-                    SqlCommand command = new SqlCommand($"Update Person set Name='{Name}',SurName='{SurName}',MiddleName='{MiddleName}',BirthDate={DateTimeDB} where ID={ID}", connection);
-                    SqlDataReader reader = command.ExecuteReader();
-                    System.Console.WriteLine("Updated Succesfully");
-                }
-                else
-                {
-                    System.Console.WriteLine("This ID doesnt exists");
-                }
-            }
-            else
-            {
-                System.Console.WriteLine("Please Fill all fields");
-            }
-            connection.Close();
-        }
-        static void DeleteBy(SqlConnection connection, int ID)
-        {
-            connection.Open();
-            SqlCommand Testcommand = new SqlCommand($"select * from Person where ID={ID}", connection);
-            SqlDataReader Testreader = Testcommand.ExecuteReader();
-            if (Testreader.Read())
-            {
-                connection.Close();
-                connection.Open();
-                SqlCommand command = new SqlCommand($"Delete from Person where ID={ID}", connection);
-                SqlDataReader reader = command.ExecuteReader();
-                System.Console.WriteLine("Deleted Succesfully");
-            }
-            else
-            {
-                System.Console.WriteLine("This ID doesnt exist");
-            }
-            connection.Close();
         }
     }
+class ArrayHelper<M>
+{
+    public M Pop(ref M[] ar)
+    {
+        M[] nar = new M[ar.Length - 1];
+        for (int x = 0; x < ar.Length - 1; x++)
+        {
+            nar[x] = ar[x];
+        }
+        M last = ar[ar.Length - 1];
+        ar = nar;
+        return last;
+    }
+    public void Push(ref M[] ar, M ne)
+    {
+        M[] nar = new M[ar.Length + 1];
+        for (int x = 0; x < ar.Length; x++)
+        {
+            nar[x] = ar[x];
+        }
+        nar[nar.Length - 1] = ne;
+        ar = nar;
+    }
+    public M Shift(ref M[] ar)
+    {
+        M[] nar = new M[ar.Length - 1];
+        for (int x = 0; x < nar.Length; x++)
+        {
+            nar[x] = ar[x + 1];
+        }
+        M first= ar[0];
+        ar = nar;
+        return first;
+    }
+    public void UnShift(ref M[] ar, M ne)
+    {
+        M[] nar = new M[ar.Length + 1];
+        nar[0] = ne;
+        for (int x = 0; x < nar.Length - 1; x++)
+        {
+            nar[x + 1] = ar[x];
+        }
+        ar = nar;
+    }
+    public M[] Slice(ref M[] arr, int x)
+    {
+        if (x < 0)
+        {
+            M[] narr = new M[Math.Abs(x)];
+            int cn = 0;
+            bool ch = true;
+            for (int i = arr.Length - 1; ch; i--)
+            {
+                ch = !(cn == Math.Abs(x) - 1);
+                narr[cn] = arr[i];
+                cn++;
+            }
+            return narr;
+        }
+        else if (x > 0)
+        {
+            M[] narr = new M[arr.Length - x + 1];
+            int cn = 0;
+            for (int i = 0; i <= x; i++)
+            {
+                narr[cn] = arr[i];
+                cn++;
+            }
+            return narr;
+        }
+        else
+        {
+            return arr;
+        }
+    }
+    public M[] Slice(ref M[] arr, int x, int y)
+    {
+        if (x > 0 && y > 0)
+        {
+            M[] narr = new M[y - x + 1];
+            int cn = 0;
+            for (int i = x; i <= y; i++)
+            {
+                narr[cn] = arr[i];
+                cn++;
+            }
+            return narr;
+        }
+        else if (x > 0 && y < 0)
+        {
+            M[] narr = new M[arr.Length - Math.Abs(y) - 1];
+            int cn = 0;
+            for (int i = x; i <= narr.Length; i++)
+            {
+                narr[cn] = arr[i];
+                cn++;
+            }
+            return narr;
+        }
+        else
+        {
+            return arr;
+        }
+    }
+}
 }
